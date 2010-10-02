@@ -32,6 +32,7 @@ document.documentElement.ondrop = function (e) {
         schema[c[2].innerText.replace(/[^\w]/g,'').toLowerCase()] = {
           desc: c[11].innerText,
           name: c[0].innerText,
+          mu: c[4].innerText.trim() == '*',
           level: c[1].innerText,
           def: c[6].innerText,
           type: c[7].innerText
@@ -63,19 +64,23 @@ document.documentElement.ondrop = function (e) {
         len++;
       }
       //console.log('len',len)
+      //console.log(binstr.charCodeAt(offset + len));
       var unpad = binstr.charCodeAt(offset+len).toString(2);
-      var segments = 8 - unpad.length;
+      var segments = (8 - unpad.length);
+
       
       var tex = unpad.substr(1); //initialize the binary with the first few digits
       //console.log('initial stuff',tex);
       for(var i = 1; i <= segments; i++){
         //console.log(binstr.charCodeAt(offset+len+i).toString(2))
-        tex += binstr.charCodeAt(offset+len+i).toString(2);
+        
+        var tmp = binstr.charCodeAt(offset+len+i).toString(2);
+        var pd = (new Array(8 - tmp.length + 1)).join('0') + tmp;
+        tex += pd;
       }
 
-      //console.log(tex);
+      //console.log(segments, len, tex);
       var size = parseInt(tex, 2);
-
       //console.log(size);
       offset = offset+len+i;
       
@@ -92,24 +97,45 @@ document.documentElement.ondrop = function (e) {
       }
       if(msg){
         var type = msg.type;
-        var dat;
+        var dat = null;
         if(type == 'u'){
-          dat = parseInt(data.split('').map(function(a){
-            return a.charCodeAt(0).toString(2)
-          }),2);
+          var bint = data.split('').map(function(a){
+            var unpad = a.charCodeAt(0).toString(2);
+            var pad = (new Array(8 - unpad.length + 1)).join('0') + unpad;
+            return pad;
+          }).join('');
+          dat = bint.length//parseInt(bint,2);
         }else if(type == 'i'){
         }else if(type == 's'){
           dat = data;
         }else if(type == '8'){
+          dat = data;
         }else if(type == 'b'){
-          dat = data; //not interpreted by parser
+          dat = data.substr(0,100); //not interpreted by parser
         }else if(type == 'f'){
+          var bint = data.split('').map(function(a){
+            var unpad = a.charCodeAt(0).toString(2);
+            var pad = (new Array(8 - unpad.length + 1)).join('0') + unpad;
+            return pad;
+          }).join('');
+
+
+          //IEEE 754 single precision binary floating point format
+          dat = bint.length;
+          if(bint.length == 64){
+            var sign = bint.charAt(0);
+            var expo = parseInt(bint.substr(1,11),2) - 1023;
+            var frac = bint.substr(12, 52);
+            
+          }else if(bint.length == 32){
+          }
         }else if(type == 'd'){
         }else if(type == 'm'){
           dat = '(master element)'
         }
 
-        console.log((new Array(lev)).join('--'), schema[classID].name, dat || type)
+
+        console.log((new Array(lev)).join('--'), type, schema[classID].name, '(', size, ')', dat)
         if(type == 'm'){
           lev++;
           parse_subset(data);
