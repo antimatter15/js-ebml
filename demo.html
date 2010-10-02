@@ -1,0 +1,36 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head>
+<meta charset=utf-8 /> 
+<title>EBML Parser</title> 
+
+<body> 
+      <h1>EBML Parser</h1> 
+      <p>
+        Drag an EBML file here.
+      </p>
+<script src="schema.js"></script>
+<script src="lib.js"></script>
+<script> 
+
+document.documentElement.ondragover = function () { return false; };
+document.documentElement.ondragend = function () { return false; };
+document.documentElement.ondrop = function (e) {
+  e.preventDefault();
+  console.log(e);
+  var file = e.dataTransfer.files[0],
+      reader = new FileReader();
+  reader.onload = function (event) {
+    var binary = event.target.result;
+    console.log('loaded string');
+
+
+    
+  };
+  reader.readAsBinaryString(file);
+ 
+  return false;
+};
+</script>   
+</body> 
+</html> 
