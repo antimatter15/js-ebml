@@ -1,0 +1,771 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head>
+<meta charset=utf-8 /> 
+<title>EBML Parser</title> 
+
+<body> 
+      <h1>EBML Parser</h1> 
+      <p>
+        Drag an EBML file here.
+      </p>
+
+<script> 
+
+document.documentElement.ondragover = function () { return false; };
+document.documentElement.ondragend = function () { return false; };
+document.documentElement.ondrop = function (e) {
+  e.preventDefault();
+  console.log(e);
+  var file = e.dataTransfer.files[0],
+      reader = new FileReader();
+  reader.onload = function (event) {
+    var binary = event.target.result;
+    console.log('loaded string');
+
+
+    var rows = document.getElementsByTagName('table')[0].getElementsByTagName('tr');
+    schema = {};
+    for(var i = 0; i < rows.length; i++){
+      var c = rows[i].getElementsByTagName('td');
+      if(c.length == 12){ 
+        schema[c[2].innerText.replace(/[^\w]/g,'').toLowerCase()] = {
+          desc: c[11].innerText,
+          name: c[0].innerText,
+          level: c[1].innerText,
+          def: c[6].innerText,
+          type: c[7].innerText
+        }
+      }
+    }
+    
+
+    function parse_subset(binstr){
+      var offset = 0;
+      while(offset < binstr.length){
+      var unpad = binstr.charCodeAt(offset).toString(2);
+      var segments = 8 - unpad.length; //additional segments to decode to get element ID
+      var padding = (new Array(segments + 1)).join('0');
+      //console.log(padding + unpad);
+      //console.log(segments);
+      var classID = '';
+      for(var i = 0; i <= segments; i++){
+        var b = binstr.charCodeAt(offset+i);
+        //console.log(b.toString(16));
+        classID += b.toString(16);
+      }
+      //console.log(classID);
+      offset += segments + 1;
+
+      var len = 0;
+      while(binstr.charCodeAt(offset + len) == 0){
+        len++;
+      }
+      //console.log('len',len)
+      var unpad = binstr.charCodeAt(offset+len).toString(2);
+      var segments = 8 - unpad.length;
+      
+      var tex = unpad.substr(1); //initialize the binary with the first few digits
+      //console.log('initial stuff',tex);
+      for(var i = 1; i <= segments; i++){
+        //console.log(binstr.charCodeAt(offset+len+i).toString(2))
+        tex += binstr.charCodeAt(offset+len+i).toString(2);
+      }
+
+      //console.log(tex);
+      var size = parseInt(tex, 2);
+
+      //console.log(size);
+      offset = offset+len+i;
+      
+      var data = binstr.substr(offset, size);
+
+      offset += size;
+      
+      //console.log(data);
+    // m: Master, u: unsigned int, i: signed integer, s: string, 8: UTF-8 string, b: binary, f: float, d: date
+
+      var msg = schema[classID];
+      if(!msg){
+        console.log(offset, binstr.length);
+      }
+      if(msg){
+        var type = msg.type;
+        var dat;
+        if(type == 'u'){
+          dat = parseInt(data.split('').map(function(a){
+            return a.charCodeAt(0).toString(2)
+          }),2);
+        }else if(type == 'i'){
+        }else if(type == 's'){
+          dat = data;
+        }else if(type == '8'){
+        }else if(type == 'b'){
+          dat = data; //not interpreted by parser
+        }else if(type == 'f'){
+        }else if(type == 'd'){
+        }else if(type == 'm'){
+          dat = '(master element)'
+        }
+
+        console.log(schema[classID].name, dat || type)
+        if(type == 'm'){
+          //console.log(data.charCodeAt(0).toString(16), 'frst magical');
+          parse_subset(data);
+        }
+      }
+      }
+    }
+
+    parse_subset(binary);
+    
+  };
+  reader.readAsBinaryString(file);
+ 
+  return false;
+};
+</script>   
+
+
+
+<table> 
+  <tbody> 
+<tr class="toptitle"> 
+  <th style="white-space: nowrap">Element Name</th> 
+  <th title="Level"><abbr title="Level">L</abbr></th> 
+  <th style="white-space: nowrap">EBML ID</th> 
+  <th title="Mandatory"><abbr title="Mandatory">Ma</abbr></th> 
+  <th title="Multiple"><abbr title="Multiple">Mu</abbr></th> 
+  <th title="Range"><abbr title="Range">Rng</abbr></th> 
+  <th>Default</th> 
+  <th title="Element Type"><abbr title="Element Type">T</abbr></th> 
+  <th title="Version 1"><abbr title="Version 1">1</abbr></th> 
+  <th title="Version 2"><abbr title="Version 2">2</abbr></th> 
+  <th title="WebM"><abbr title="WebM">W</abbr></th> 
+  <th>Description</th> 
+</tr> 
+<tr> 
+  <th colspan="12" id="EBML Header">EBML Header</th> 
+</tr> 
+<tr id="EBML" class="level0"> 
+  <td>EBML</td> 
+  <td>0</td> 
+  <td>[1A][45][DF][A3]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>Set the EBML characteristics of the data to follow. Each EBML document
+    has to start with this.</td> 
+</tr> 
+<tr id="EBMLVersion" class="level1"> 
+  <td>EBMLVersion</td> 
+  <td>1</td> 
+  <td>[42][86]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>The version of EBML parser used to create the file.</td> 
+</tr> 
+<tr id="EBMLReadVersion" class="level1"> 
+  <td>EBMLReadVersion</td> 
+  <td>1</td> 
+  <td>[42][F7]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>The minimum EBML version a parser has to support to read this file.</td> 
+</tr> 
+<tr id="EBMLMaxIDLength" class="level1"> 
+  <td>EBMLMaxIDLength</td> 
+  <td>1</td> 
+  <td>[42][F2]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>4</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>The maximum length of the IDs you'll find in this file (4 or less in
+    Matroska).</td> 
+</tr> 
+<tr id="EBMLMaxSizeLength" class="level1"> 
+  <td>EBMLMaxSizeLength</td> 
+  <td>1</td> 
+  <td>[42][F3]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>8</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+      <td>The maximum length of the sizes you'll find in this file (8 or less
+        in Matroska). This does not override the element size indicated at the
+        beginning of an element. Elements that have an indicated size which is
+        larger than what is allowed by EBMLMaxSizeLength shall be considered invalid.</td> 
+</tr> 
+<tr id="DocType" class="level1"> 
+  <td>DocType</td> 
+  <td>1</td> 
+  <td>[42][82]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>matroska</td> 
+  <td><abbr title="String">s</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>A string that describes the type of document that follows this EBML header. 'matroska' in our case or 'webm' for webm files.</td> 
+</tr> 
+<tr id="DocTypeVersion" class="level1"> 
+  <td>DocTypeVersion</td> 
+  <td>1</td> 
+  <td>[42][87]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>The version of DocType interpreter used to create the file.</td> 
+</tr> 
+<tr id="DocTypeReadVersion" class="level1"> 
+  <td>DocTypeReadVersion</td> 
+  <td>1</td> 
+  <td>[42][85]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>The minimum DocType version an interpreter has to support to read this file.</td> 
+</tr> 
+<tr> 
+  <th colspan="12" >Global elements (used everywhere in the format)</th> 
+</tr> 
+<tr id="CRC-32" class="level1"> 
+  <td>CRC-32</td> 
+  <td>1+</td> 
+  <td>[BF]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The CRC is computed on all the data of the Master element it's in. The CRC element should be the first in it's parent master for easier reading. All level 1 elements should include a CRC-32. The CRC in use is the IEEE CRC32 Little Endian</td> 
+</tr> 
+<tr id="Void" class="level1"> 
+  <td>Void</td> 
+  <td>1+</td> 
+  <td>[EC]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Used to void damaged data, to avoid unexpected behaviors when using
+    damaged data. The content is discarded. Also used to reserve space
+    in a sub-element for later use.</td> 
+</tr> 
+<tr class="subclass"> 
+  <td colspan="12" >signature</td> 
+</tr> 
+<tr class="version2" id="SignatureSlot"> 
+  <td>SignatureSlot</td> 
+  <td>1+</td> 
+  <td>[1B][53][86][67]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>Contain signature of some (coming) elements in the stream.</td> 
+</tr> 
+<tr class="version2" id="SignatureAlgo"> 
+  <td>SignatureAlgo</td> 
+  <td>2+</td> 
+  <td>[7E][8A]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>Signature algorithm used (1=RSA, 2=elliptic).</td> 
+</tr> 
+<tr class="version2" id="SignatureHash"> 
+  <td>SignatureHash</td> 
+  <td>2+</td> 
+  <td>[7E][9A]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>Hash algorithm used (1=SHA1-160, 2=MD5).</td> 
+</tr> 
+<tr class="version2" id="SignaturePublicKey"> 
+  <td>SignaturePublicKey</td> 
+  <td>2+</td> 
+  <td>[7E][A5]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>The public key to use with the algorithm (in the case of a PKI-based
+    signature).</td> 
+</tr> 
+<tr class="version2" id="Signature"> 
+  <td>Signature</td> 
+  <td>2+</td> 
+  <td>[7E][B5]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>The signature of the data (until a new.</td> 
+</tr> 
+<tr class="version2" id="SignatureElements"> 
+  <td>SignatureElements</td> 
+  <td>2+</td> 
+  <td>[7E][5B]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+ 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>Contains elements that will be used to compute the signature.</td> 
+</tr> 
+<tr class="version2" id="SignatureElementList"> 
+  <td>SignatureElementList</td> 
+  <td>3+</td> 
+  <td>[7E][7B]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>A list consists of a number of consecutive elements that represent one
+    case where data is used in signature. Ex: <i>Cluster|Block|BlockAdditional</i> 
+    means that the BlockAdditional of all Blocks in all Clusters is used for
+    encryption.</td> 
+</tr> 
+<tr class="version2" id="SignedElement"> 
+  <td>SignedElement</td> 
+  <td>4+</td> 
+  <td>[65][32]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td></td> 
+  <td></td> 
+  <td></td> 
+  <td>An element ID whose data will be used to compute the signature.</td> 
+</tr> 
+<tr class="subclass"> 
+  <td colspan="12" >end of signature</td> 
+<tr class="toptitle"> 
+  <th>Element Name</th> 
+  <th title="Level"><abbr title="Level">L</abbr></th> 
+  <th>EBML ID</th> 
+  <th title="Mandatory"><abbr title="Mandatory">Ma</abbr></th> 
+  <th title="Multiple"><abbr title="Multiple">Mu</abbr></th> 
+  <th title="Range"><abbr title="Range">Rng</abbr></th> 
+  <th>Default</th> 
+  <th title="Element Type"><abbr title="Element Type">T</abbr></th> 
+  <th title="Version 1"><abbr title="Version 1">1</abbr></th> 
+  <th title="Version 2"><abbr title="Version 2">2</abbr></th> 
+  <th title="WebM"><abbr title="WebM">W</abbr></th> 
+  <th>Description</th> 
+</tr> 
+<tr id="Segment"> 
+  <th colspan="12" >Segment</th> 
+</tr> 
+<tr class="level0"> 
+  <td>Segment</td> 
+  <td>0</td> 
+  <td>[18][53][80][67]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>This element contains all other top-level (level 1) elements. Typically
+    a Matroska file is composed of 1 segment.</td> 
+</tr> 
+<tr id="MetaSeekInformation"> 
+  <th colspan="12" >Meta Seek Information</th> 
+</tr> 
+<tr id="SeekHead" class="level1"> 
+  <td>SeekHead</td> 
+  <td>1</td> 
+  <td>[11][4D][9B][74]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Contains the <a href="notes.html#Position_References">position</a> of other level 1 elements.</td> 
+</tr> 
+<tr id="Seek" class="level2"> 
+  <td>Seek</td> 
+  <td>2</td> 
+  <td>[4D][BB]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Contains a single seek entry to an EBML element.</td> 
+</tr> 
+<tr id="SeekID" class="level3"> 
+  <td>SeekID</td> 
+  <td>3</td> 
+  <td>[53][AB]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>The binary ID corresponding to the element name.</td> 
+</tr> 
+<tr id="SeekPosition" class="level3"> 
+  <td>SeekPosition</td> 
+  <td>3</td> 
+  <td>[53][AC]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>The <a href="notes.html#Position_References">position</a> of the element in the segment in
+    octets (0 = first level 1 element).</td> 
+</tr> 
+<tr id="SegmentInformation"> 
+  <th colspan="12" >Segment Information</th> 
+</tr> 
+<tr id="Info" class="level1"> 
+  <td>Info</td> 
+  <td>1</td> 
+  <td>[15][49][A9][66]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Contains miscellaneous general information and statistics on the file.</td> 
+</tr> 
+<tr id="SegmentUID" class="level2"> 
+  <td>SegmentUID</td> 
+  <td>2</td> 
+  <td>[73][A4]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A randomly generated unique ID to identify the current segment between many others (128 bits).</td> 
+</tr> 
+<tr id="SegmentFilename" class="level2"> 
+  <td>SegmentFilename</td> 
+  <td>2</td> 
+  <td>[73][84]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+      <td>A filename corresponding to this segment.</td> 
+</tr> 
+<tr id="PrevUID" class="level2"> 
+  <td>PrevUID</td> 
+  <td>2</td> 
+  <td>[3C][B9][23]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A unique ID to identify the previous chained segment (128 bits).</td> 
+</tr> 
+<tr id="PrevFilename" class="level2"> 
+  <td>PrevFilename</td> 
+  <td>2</td> 
+  <td>[3C][83][AB]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>An escaped filename corresponding to the previous segment.</td> 
+</tr> 
+<tr id="NextUID" class="level2"> 
+  <td>NextUID</td> 
+  <td>2</td> 
+  <td>[3E][B9][23]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A unique ID to identify the next chained segment (128 bits).</td> 
+</tr> 
+<tr id="NextFilename" class="level2"> 
+  <td>NextFilename</td> 
+  <td>2</td> 
+  <td>[3E][83][BB]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>An escaped filename corresponding to the next segment.</td> 
+</tr> 
+<tr id="SegmentFamily" class="level2"> 
+  <td>SegmentFamily</td> 
+  <td>2</td> 
+  <td>[44][44]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A randomly generated unique ID that all segments related to each other must use (128 bits).</td> 
+</tr> 
+<tr id="ChapterTranslate" class="level2"> 
+  <td>ChapterTranslate</td> 
+  <td>2</td> 
+  <td>[69][24]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A tuple of corresponding ID used by chapter codecs to represent this segment.</td> 
+</tr> 
+<tr id="ChapterTranslateEditionUID" class="level3"> 
+  <td>ChapterTranslateEditionUID</td> 
+  <td>3</td> 
+  <td>[69][FC]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Specify an edition UID on which this correspondance applies. When not specified, it means for all editions found in the segment.</td> 
+</tr> 
+<tr id="ChapterTranslateCodec" class="level3"> 
+  <td>ChapterTranslateCodec</td> 
+  <td>3</td> 
+  <td>[69][BF]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The <a href="#ChapProcessCodecID">chapter codec</a> using this ID (0: Matroska Script, 1: DVD-menu).</td> 
+</tr> 
+<tr id="ChapterTranslateID" class="level3"> 
+  <td>ChapterTranslateID</td> 
+  <td>3</td> 
+  <td>[69][A5]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The binary value used to represent this segment in the chapter codec data. The format depends on the <a href="chapters/#ChapProcessCodecID">ChapProcessCodecID</a> used.</td> 
+</tr> 
+<tr id="TimecodeScale" class="level2"> 
+  <td>TimecodeScale</td> 
+  <td>2</td> 
+  <td>[2A][D7][B1]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>1.000.000</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Timecode scale in nanoseconds (1.000.000 means all timecodes in the
+    segment are expressed in milliseconds).</td> 
+</tr> 
+<tr id="Duration" class="level2"> 
+  <td>Duration</td> 
+  <td>2</td> 
+  <td>[44][89]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>&gt; 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Float">f</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Duration of the segment (based on TimecodeScale).</td> 
+</tr> 
+<tr id="DateUTC" class="level2"> 
+  <td>DateUTC</td> 
+  <td>2</td> 
+      <td>[44][61]</td> 
+  <td class="unset">-</td> 
+      <td class="unset">-</td> 
+  <td class="unset">-</td> 
+      <td class="unset">-</td> 
+  <td><abbr title="Date">d</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+      <td>Date of the origin of timecode (value 0), i.e. production date.</td> 
+    </tr> 
+<tr id="Title" class="level2"> 
+  <td>Title</td> 
+  <td>2</td> 
+  <td>[7B][A9]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>General name of the segment.</td> 
+</tr> 
+<tr id="MuxingApp" class="level2"> 
+  <td>MuxingApp</td> 
+  <td>2</td> 
+  <td>[4D][80]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Muxing application or library ("libmatroska-0.4.3").</td> 
+</tr> 
+<tr id="WritingApp" class="level2"> 
+  <td>WritingApp</td> 
+  <td>2</td> 
+  <td>[57][41]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Writing application ("mkvmerge-0.3.3").</td> 
+</tr> 
+</body> 
+</html> 
