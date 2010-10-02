@@ -109,7 +109,7 @@ function generateEBML(json){
     var el_len = json[i].pop ? json[i].length : 1;
     for(var k = 0; k < el_len; k++){
       var data = json[i].pop ? json[i][k] : json[i];
-      console.log(i,k,data);
+      //console.log(i,k,data);
       var hexid = nameHexMap[i] || i;
       if(typeof data == 'object'){
         
@@ -128,7 +128,7 @@ function generateEBML(json){
         var size = (new Array(zeroes + 1)).join('0') + '1' + padded;
 
         ebml += toBinStr(parseInt(hexid, 16).toString(2));
-        console.log(size, size_str, size.toString(16));
+        //console.log(size, size_str, size.toString(16));
         ebml += toBinStr(size);
         ebml += data;
       }else{

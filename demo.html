@@ -8,6 +8,7 @@
       <h1>EBML Parser</h1> 
       <p>
         Drag an EBML file here.
+        <video id="awesome"></video>
       </p>
 <script src="schema.js"></script>
 <script src="lib.js"></script>
@@ -30,7 +31,7 @@ function encode_64(input) {
 	}
 	return output;
 }
-
+var awesome = document.getElementById('awesome');
 
 //location='data:video/webm;base64,'+encode_64(generateEBML(EBML))
 document.documentElement.ondragover = function () { return false; };
@@ -43,9 +44,27 @@ document.documentElement.ondrop = function (e) {
   reader.onload = function (event) {
     var binary = event.target.result;
     console.log('loaded string');
+    var ebml = parseEBML(binary);
+    if(window.EBML){
+      EBML2 = ebml;
+      //EBML.Segment[0].Tracks[0].TrackEntry[0].Video
+      //{DisplayHeight, DisplayWidth, PixelHeight, PixelWidth
+      //EBML.Segment[0].Cluster[0].SimpleBlock[0]
+      //string with stuff
 
-    EBML = parseEBML(binary);
-    
+      var V1 = EBML.Segment[0].Tracks[0].TrackEntry[0].Video;
+      var V2 = EBML2.Segment[0].Tracks[0].TrackEntry[0].Video;
+
+      V1.DisplayHeight = V2.PixelHeight;
+      V1.DisplayWidth = V2.PixelWidth;
+      V1.PixelHeight = V2.PixelHeight;
+      V1.PixelWidth = V2.PixelWidth;
+
+      EBML.Segment[0].Cluster[0].SimpleBlock[0] = EBML2.Segment[0].Cluster[0].SimpleBlock[0]
+      awesome.src = 'data:video/webm;base64,'+encode_64(generateEBML(EBML))
+    }else{
+      EBML = ebml;
+    }
   };
   reader.readAsBinaryString(file);
  
