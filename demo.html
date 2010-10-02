@@ -13,6 +13,18 @@
 <script src="schema.js"></script>
 <script src="lib.js"></script>
 <script> 
+
+function parseRIFF(string){
+  var offset = 0;
+  var id = string.substr(offset, 4);
+  var len = parseInt(string.substr(offset+4, 4).split('').map(function(i){
+    var unpadded = i.charCodeAt(0).toString(2);
+    return (new Array(8 - unpadded.length + 1)).join('0') + unpadded
+  }).join(''),2);
+  var data = string.substr(offset + 4 + 4, len);
+  
+}
+
 function encode_64(input) {
 	var output = "", i = 0, l = input.length,
 	key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", 
