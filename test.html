@@ -38,7 +38,8 @@ document.documentElement.ondrop = function (e) {
         }
       }
     }
-    
+
+    var lev = 1;
 
     function parse_subset(binstr){
       var offset = 0;
@@ -108,10 +109,11 @@ document.documentElement.ondrop = function (e) {
           dat = '(master element)'
         }
 
-        console.log(schema[classID].name, dat || type)
+        console.log((new Array(lev)).join('--'), schema[classID].name, dat || type)
         if(type == 'm'){
-          //console.log(data.charCodeAt(0).toString(16), 'frst magical');
+          lev++;
           parse_subset(data);
+          lev--;
         }
       }
       }
@@ -128,6 +130,7 @@ document.documentElement.ondrop = function (e) {
 
 
 
+ 
 <table> 
   <tbody> 
 <tr class="toptitle"> 
@@ -767,5 +770,2430 @@ document.documentElement.ondrop = function (e) {
   <td>*</td> 
   <td>Writing application ("mkvmerge-0.3.3").</td> 
 </tr> 
+<tr id="Cluster"> 
+  <th colspan="12" >Cluster</th> 
+</tr> 
+<tr class="level1"> 
+  <td>Cluster</td> 
+  <td>1</td> 
+  <td>[1F][43][B6][75]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>The lower level element containing the (monolithic) Block structure.</td> 
+</tr> 
+<tr id="Timecode" class="level2"> 
+  <td>Timecode</td> 
+  <td>2</td> 
+  <td>[E7]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Absolute timecode of the cluster (based on TimecodeScale).</td> 
+</tr> 
+<tr id="SilentTracks" class="level2"> 
+  <td>SilentTracks</td> 
+  <td>2</td> 
+  <td>[58][54]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The list of tracks that are not used in that part of the stream. It is useful when using overlay tracks on seeking. Then you should decide what track to use.</td> 
+</tr> 
+<tr id="SilentTrackNumber" class="level3"> 
+  <td>SilentTrackNumber</td> 
+  <td>3</td> 
+  <td>[58][D7]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>One of the track number that are not used from now on in the stream. It could change later if not specified as silent in a further Cluster.</td> 
+</tr> 
+<tr id="Position" class="level2"> 
+  <td>Position</td> 
+  <td>2</td> 
+  <td>[A7]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td><a href="notes.html#Position_References">Position</a> of the Cluster in the segment (0 in
+    live broadcast streams). It might help to resynchronise offset on damaged
+    streams.</td> 
+</tr> 
+<tr id="PrevSize" class="level2"> 
+  <td>PrevSize</td> 
+  <td>2</td> 
+  <td>[AB]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Size of the previous Cluster, in octets. Can be useful for backward
+    playing.</td> 
+</tr> 
+<tr id="SimpleBlock" class="level2"> 
+  <td>SimpleBlock</td> 
+  <td>2</td> 
+  <td>[A3]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Similar to <a href="#Block">Block</a> but without all the extra information, mostly used to reduced overhead when no extra feature is needed. (see <a href="#simpleblock_structure">SimpleBlock Structure</a>)</td> 
+</tr> 
+<tr id="BlockGroup" class="level2"> 
+  <td>BlockGroup</td> 
+  <td>2</td> 
+  <td>[A0]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Basic container of information containing a single Block or BlockVirtual,
+    and information specific to that Block/VirtualBlock.</td> 
+</tr> 
+<tr id="Block" class="level3"> 
+  <td>Block</td> 
+  <td>3</td> 
+  <td>[A1]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Block containing the actual data to be rendered and a timecode relative
+    to the Cluster Timecode. (see <a href="#block_structure">Block Structure</a>)</td> 
+</tr> 
+<tr class="version2" id="BlockVirtual"> 
+  <td>BlockVirtual</td> 
+  <td>3</td> 
+  <td>[A2]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td>A Block with no data. It must be stored in the stream at the place the real Block should be in display order. (see <a href="#block_virtual">Block Virtual</a>)</td> 
+</tr> 
+<tr id="BlockAdditions" class="level3"> 
+  <td>BlockAdditions</td> 
+  <td>3</td> 
+  <td>[75][A1]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contain additional blocks to complete the main one. An EBML parser that has no knowledge of the Block structure could still see and use/skip these data.</td> 
+</tr> 
+<tr id="BlockMore" class="level4"> 
+  <td>BlockMore</td> 
+  <td>4</td> 
+  <td>[A6]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contain the BlockAdditional and some parameters.</td> 
+</tr> 
+<tr id="BlockAddID" class="level5"> 
+  <td>BlockAddID</td> 
+  <td>5</td> 
+  <td>[EE]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>An ID to identify the BlockAdditional level.</td> 
+</tr> 
+<tr class="level5"> 
+  <td>BlockAdditional</td> 
+  <td>5</td> 
+  <td>[A5]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Interpreted by the codec as it wishes (using the BlockAddID).</td> 
+</tr> 
+<tr id="BlockDuration" class="level3"> 
+  <td>BlockDuration</td> 
+  <td>3</td> 
+  <td>[9B]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>TrackDuration</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>The duration of the Block (based on TimecodeScale). This element is mandatory when DefaultDuration is set for the track. When not written and with no DefaultDuration, the value is assumed to be the difference between the timecode of this Block and the timecode of the next Block in &quot;display&quot; order (not coding order). This element can be useful at the end of a Track (as there is not other Block available), or when there is a break in a track like for subtitle tracks.</td> 
+</tr> 
+<tr id="ReferencePriority" class="level3"> 
+  <td>ReferencePriority</td> 
+  <td>3</td> 
+  <td>[FA]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>This frame is referenced and has the specified cache priority. In cache
+    only a frame of the same or higher priority can replace this frame. A
+    value of 0 means the frame is not referenced.</td> 
+</tr> 
+<tr id="ReferenceBlock" class="level3"> 
+  <td>ReferenceBlock</td> 
+  <td>3</td> 
+  <td>[FB]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Signed Integer">i</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Timecode of another frame used as a reference (ie: B or P frame). The
+    timecode is relative to the block it's attached to.</td> 
+</tr> 
+<tr class="version2" id="ReferenceVirtual"> 
+  <td>ReferenceVirtual</td> 
+  <td>3</td> 
+  <td>[FD]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Signed Integer">i</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td>Relative <a href="notes.html#Position_References">position</a> of the data that should be
+    in position of the virtual block.</td> 
+</tr> 
+<tr id="CodecState" class="level3"> 
+  <td>CodecState</td> 
+  <td>3</td> 
+  <td>[A4]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The new codec state to use. Data interpretation is private to the codec.
+    This information should always be referenced by a seek entry.</td> 
+</tr> 
+<tr id="Slices" class="level3"> 
+  <td>Slices</td> 
+  <td>3</td> 
+  <td>[8E]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contains slices description.</td> 
+</tr> 
+<tr id="TimeSlice" class="level4"> 
+  <td>TimeSlice</td> 
+  <td>4</td> 
+  <td>[E8]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contains extra time information about the data contained in the Block. While there are a few files in the wild with this element, it is no longer in use and has been deprecated.  Being able to interpret this element is not required for playback.</td> 
+</tr> 
+<tr id="LaceNumber" class="level5"> 
+  <td>LaceNumber</td> 
+  <td>5</td> 
+  <td>[CC]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>The reverse number of the frame in the lace (0 is the last frame, 1 is the next to last, etc). While there are a few files in the wild with this element, it is no longer in use and has been deprecated.  Being able to interpret this element is not required for playback.</td> 
+</tr> 
+<tr class="version2" id="FrameNumber"> 
+  <td>FrameNumber</td> 
+  <td>5</td> 
+  <td>[CD]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td><td class="flagnot"></td><td class="flagnot"></td><td class="flagnot"></td> 
+  <td>The number of the frame to generate from this lace with this delay (allow you to generate many frames from the same Block/Frame).</td> 
+</tr> 
+<tr class="version2" id="BlockAdditionID"> 
+  <td>BlockAdditionID</td> 
+  <td>5</td> 
+  <td>[CB]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td><td class="flagnot"></td><td class="flagnot"></td><td class="flagnot"></td> 
+  <td>The ID of the BlockAdditional element (0 is the main Block).</td> 
+</tr> 
+<tr class="version2" id="BlockDelay"> 
+  <td>Delay</td> 
+  <td>5</td> 
+  <td>[CE]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td><td class="flagnot"></td><td class="flagnot"></td><td class="flagnot"></td> 
+  <td>The (scaled) delay to apply to the element.</td> 
+</tr> 
+<tr class="version2" id="SDuration"> 
+  <td>Duration</td> 
+  <td>5</td> 
+  <td>[CF]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td><td class="flagnot"></td><td class="flagnot"></td><td class="flagnot"></td> 
+  <td>The (scaled) duration to apply to the element.</td> 
+</tr> 
+<tr class="version2" id="EncryptedBlock"> 
+  <td>EncryptedBlock</td> 
+  <td>2</td> 
+  <td>[AF]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td>Similar to <a href="#SimpleBlock">SimpleBlock</a> but the data inside the Block are Transformed (encrypt and/or signed). (see <a href="#encryptedblock_structure">EncryptedBlock Structure</a>)</td> 
+</tr> 
+<tr id="Track"> 
+  <th colspan="12" >Track</th> 
+</tr> 
+<tr id="Tracks" class="level1"> 
+  <td>Tracks</td> 
+  <td>1</td> 
+  <td>[16][54][AE][6B]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>A top-level block of information with many tracks described.</td> 
+</tr> 
+<tr id="TrackEntry" class="level2"> 
+  <td>TrackEntry</td> 
+  <td>2</td> 
+  <td>[AE]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Describes a track with all elements.</td> 
+</tr> 
+<tr id="TrackNumber" class="level3"> 
+  <td>TrackNumber</td> 
+  <td>3</td> 
+  <td>[D7]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+      <td>The track number as used in the Block Header (using more than 127 tracks
+        is not encouraged, though the design allows an unlimited number).</td> 
+</tr> 
+<tr id="TrackUID" class="level3"> 
+  <td>TrackUID</td> 
+  <td>3</td> 
+  <td>[73][C5]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+      <td>A unique ID to identify the Track. This should be kept the same when making a direct stream copy of the Track to another file.</td> 
+</tr> 
+<tr id="TrackType" class="level3"> 
+  <td>TrackType</td> 
+  <td>3</td> 
+  <td>[83]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td style="white-space: nowrap">1-254</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>A set of track types coded on 8 bits (1: video, 2: audio, 3: complex, 0x10: logo, 0x11: subtitle, 0x12: buttons, 0x20: control).</td> 
+</tr> 
+<tr id="FlagEnabled" class="level3"> 
+  <td>FlagEnabled</td> 
+  <td>3</td> 
+  <td>[B9]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0-1</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Set if the track is used. (1 bit)</td> 
+</tr> 
+<tr id="FlagDefault" class="level3"> 
+  <td>FlagDefault</td> 
+  <td>3</td> 
+  <td>[88]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0-1</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Set if that track (audio, video or subs) SHOULD be used if no language found matches the user preference. (1 bit)</td> 
+</tr> 
+<tr id="FlagForced" class="level3"> 
+  <td>FlagForced</td> 
+  <td>3</td> 
+  <td>[55][AA]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>0-1</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Set if that track MUST be used during playback. There can be many forced track for a kind (audio, video or subs), the player should select the one which language matches the user preference or the default + forced track. Overlay MAY happen between a forced and non-forced track of the same kind. (1 bit)</td> 
+</tr> 
+<tr id="FlagLacing" class="level3"> 
+  <td>FlagLacing</td> 
+  <td>3</td> 
+  <td>[9C]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0-1</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Set if the track may contain blocks using lacing. (1 bit)</td> 
+</tr> 
+<tr id="MinCache" class="level3"> 
+  <td>MinCache</td> 
+  <td>3</td> 
+  <td>[6D][E7]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The minimum number of frames a player should be able to cache during playback. If set to 0, the reference pseudo-cache system is not used.</td> 
+</tr> 
+<tr id="MaxCache" class="level3"> 
+  <td>MaxCache</td> 
+  <td>3</td> 
+  <td>[6D][F8]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The maximum cache size required to store referenced frames in and the
+    current frame. 0 means no cache is needed.</td> 
+</tr> 
+<tr id="TrackDuration" class="level3"> 
+      <td>DefaultDuration</td> 
+      <td>3</td> 
+      <td>[23][E3][83]</td> 
+  <td class="unset">-</td> 
+      <td class="unset">-</td> 
+      <td>not 0</td> 
+      <td class="unset">-</td> 
+      <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+      <td>Number of nanoseconds (i.e. not scaled) per frame.</td> 
+</tr> 
+<tr id="TrackTimeCodeScale" class="level3"> 
+      <td>TrackTimecodeScale</td> 
+      <td>3</td> 
+      <td>[23][31][4F]</td> 
+  <td>*</td> 
+      <td class="unset">-</td> 
+      <td>&gt; 0</td> 
+      <td>1.0</td> 
+      <td><abbr title="Float">f</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+      <td>The scale to apply on this track to work at normal speed in relation with other tracks (mostly used to adjust video speed when the audio length differs).</td> 
+</tr> 
+<tr class="version2" id="TrackOffset"> 
+  <td>TrackOffset</td> 
+  <td>3</td> 
+  <td>[53][7F]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+      <td><abbr title="Signed Integer">i</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+      <td>A value to add to the Block's Timecode. This can be used to adjust the
+        playback offset of a track.</td> 
+</tr> 
+<tr id="MaxBlockAdditionID" class="level3"> 
+  <td>MaxBlockAdditionID</td> 
+  <td>3</td> 
+  <td>[55][EE]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The maximum value of <a href="#BlockAddID">BlockAddID</a>. A value 0 means there is no <a href="#BlockAdditions">BlockAdditions</a> for this track.</td> 
+</tr> 
+<tr id="Name" class="level3"> 
+  <td>Name</td> 
+  <td>3</td> 
+  <td>[53][6E]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>A human-readable track name.</td> 
+</tr> 
+<tr id="Language" class="level3"> 
+      <td>Language</td> 
+  <td>3</td> 
+      <td>[22][B5][9C]</td> 
+  <td class="unset">-</td> 
+      <td class="unset">-</td> 
+  <td class="unset">-</td> 
+      <td>eng</td> 
+      <td><abbr title="String">s</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+      <td>Specifies the language of the track in the <a href="#languages">Matroska languages form</a>.</td> 
+    </tr> 
+<tr id="CodecID" class="level3"> 
+  <td>CodecID</td> 
+  <td>3</td> 
+  <td>[86]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="String">s</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>An ID corresponding to the codec, see the <a href="codecid/index.html">codec page</a> for more info.</td> 
+</tr> 
+<tr id="CodecPrivate" class="level3"> 
+  <td>CodecPrivate</td> 
+  <td>3</td> 
+  <td>[63][A2]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Private data only known to the codec.</td> 
+</tr> 
+<tr id="CodecName" class="level3"> 
+  <td>CodecName</td> 
+  <td>3</td> 
+  <td>[25][86][88]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>A human-readable string specifying the codec.</td> 
+</tr> 
+<tr id="AttachmentLink" class="level3"> 
+  <td>AttachmentLink</td> 
+  <td>3</td> 
+  <td>[74][46]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The UID of an attachment that is used by this codec.</td> 
+</tr> 
+<tr class="version2" id="CodecSettings" class="level3"> 
+  <td>CodecSettings</td> 
+  <td>3</td> 
+  <td>[3A][96][97]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td>A string describing the encoding setting used.</td> 
+</tr> 
+<tr class="version2" id="CodecInfoURL"> 
+  <td>CodecInfoURL</td> 
+  <td>3</td> 
+  <td>[3B][40][40]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="String">s</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td>A URL to find information about the codec used.</td> 
+</tr> 
+<tr class="version2" id="CodecDownloadURL"> 
+  <td>CodecDownloadURL</td> 
+  <td>3</td> 
+  <td>[26][B2][40]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="String">s</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td>A URL to download about the codec used.</td> 
+</tr> 
+<tr id="CodecDecodeAll" class="level3"> 
+  <td>CodecDecodeAll</td> 
+  <td>3</td> 
+  <td>[AA]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0-1</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The codec can decode potentially damaged data (1 bit).</td> 
+</tr> 
+<tr id="TrackOverlay" class="level3"> 
+  <td>TrackOverlay</td> 
+  <td>3</td> 
+  <td>[6F][AB]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Specify that this track is an overlay track for the Track specified (in the u-integer). That means when this track has a gap (see <a href="#SilentTracks">SilentTracks</a>) the overlay track should be used instead. The order of multiple TrackOverlay matters, the first one is the one that should be used. If not found it should be the second, etc.</td> 
+</tr> 
+<tr id="TrackTranslate" class="level3"> 
+  <td>TrackTranslate</td> 
+  <td>3</td> 
+  <td>[66][24]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The track identification for the given Chapter Codec.</td> 
+</tr> 
+<tr id="TrackTranslateEditionUID" class="level4"> 
+  <td>TrackTranslateEditionUID</td> 
+  <td>4</td> 
+  <td>[66][FC]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Specify an edition UID on which this translation applies. When not specified, it means for all editions found in the segment.</td> 
+</tr> 
+<tr id="TrackTranslateCodec" class="level4"> 
+  <td>TrackTranslateCodec</td> 
+  <td>4</td> 
+  <td>[66][BF]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The <a href="#ChapProcessCodecID">chapter codec</a> using this ID (0: Matroska Script, 1: DVD-menu).</td> 
+</tr> 
+<tr id="TrackTranslateTrackID" class="level4"> 
+  <td>TrackTranslateTrackID</td> 
+  <td>4</td> 
+  <td>[66][A5]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The binary value used to represent this track in the chapter codec data. The format depends on the <a href="#ChapProcessCodecID">ChapProcessCodecID</a> used.</td> 
+</tr> 
+<tr class="subclass"> 
+  <td colspan="12" >video</td> 
+</tr> 
+<tr id="Video" class="level3"> 
+  <td>Video</td> 
+  <td>3</td> 
+  <td>[E0]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Video settings.</td> 
+</tr> 
+<tr id="FlagInterlaced" class="level4"> 
+  <td>FlagInterlaced</td> 
+  <td>4</td> 
+  <td>[9A]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0-1</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Set if the video is interlaced. (1 bit)</td> 
+</tr> 
+<tr id="StereoMode" class="level4"> 
+  <td>StereoMode</td> 
+  <td>4</td> 
+  <td>[53][B8]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Stereo-3D video mode (0: mono, 1: side by side (left is first), 2: top-bottom (right is first), 3: top-bottom (left is first), 4: checkboard (right is first), 5: checkboard (left is first), 6: row interleaved (right is first), 7: row interleaved (left is first), 8: column interleaved (right is first), 9: column interleaved (left is first), 10: anaglyph (cyan/red)). There are some more details on <a href="notes.html#3D">3D support in the Specification Notes</a>.</td> 
+</tr> 
+<tr id="PixelWidth" class="level4"> 
+  <td>PixelWidth</td> 
+  <td>4</td> 
+  <td>[B0]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Width of the encoded video frames in pixels.</td> 
+</tr> 
+<tr id="PixelHeight" class="level4"> 
+  <td>PixelHeight</td> 
+  <td>4</td> 
+  <td>[BA]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Height of the encoded video frames in pixels.</td> 
+</tr> 
+<tr id="PixelCropBottom" class="level4"> 
+  <td>PixelCropBottom</td> 
+  <td>4</td> 
+  <td>[54][AA]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>The number of video pixels to remove at the bottom of the image (for HDTV content).</td> 
+</tr> 
+<tr id="PixelCropTop" class="level4"> 
+  <td>PixelCropTop</td> 
+  <td>4</td> 
+  <td>[54][BB]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>The number of video pixels to remove at the top of the image.</td> 
+</tr> 
+<tr id="PixelCropLeft" class="level4"> 
+  <td>PixelCropLeft</td> 
+  <td>4</td> 
+  <td>[54][CC]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>The number of video pixels to remove on the left of the image.</td> 
+</tr> 
+<tr id="PixelCropRight" class="level4"> 
+  <td>PixelCropRight</td> 
+  <td>4</td> 
+  <td>[54][DD]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>The number of video pixels to remove on the right of the image.</td> 
+</tr> 
+<tr id="DisplayWidth" class="level4"> 
+  <td>DisplayWidth</td> 
+  <td>4</td> 
+  <td>[54][B0]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td>PixelWidth</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Width of the video frames to display. The default value is only valid when <a href="#DisplayUnit">DisplayUnit</a> is 0.</td> 
+</tr> 
+<tr id="DisplayHeight" class="level4"> 
+  <td>DisplayHeight</td> 
+  <td>4</td> 
+  <td>[54][BA]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td>PixelHeight</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Height of the video frames to display. The default value is only valid when <a href="#DisplayUnit">DisplayUnit</a> is 0.</td> 
+</tr> 
+<tr id="DisplayUnit" class="level4"> 
+  <td>DisplayUnit</td> 
+  <td>4</td> 
+  <td>[54][B2]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td>How  DisplayWidth &amp; DisplayHeight should be interpreted (0: pixels, 1: centimeters, 2: inches, 3: Display Aspect Ratio).</td> 
+</tr> 
+<tr id="AspectRatioType" class="level4"> 
+  <td>AspectRatioType</td> 
+  <td>4</td> 
+  <td>[54][B3]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td>Specify the possible modifications to the aspect ratio (0: free resizing, 1: keep aspect ratio, 2: fixed).</td> 
+</tr> 
+<tr id="ColourSpace" class="level4"> 
+  <td>ColourSpace</td> 
+  <td>4</td> 
+  <td>[2E][B5][24]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Same value as in AVI (32 bits).</td> 
+</tr> 
+<tr class="version2" id="GammaValue"> 
+  <td>GammaValue</td> 
+  <td>4</td> 
+  <td>[2F][B5][23]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>&gt; 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Float">f</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td>Gamma Value.</td> 
+</tr> 
+<tr class="level4"> 
+  <td>FrameRate</td> 
+  <td>4</td> 
+  <td>[23][83][E3]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>&gt; 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Float">f</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Number of frames per second. <strong>Informational</strong> only.</td> 
+</tr> 
+<tr class="subclass"> 
+  <td colspan="12" >end video</td> 
+</tr> 
+<tr class="subclass"> 
+  <td colspan="12" >audio</td> 
+</tr> 
+<tr id="Audio" class="level3"> 
+  <td>Audio</td> 
+  <td>3</td> 
+  <td>[E1]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Audio settings.</td> 
+</tr> 
+<tr id="SamplingFrequency" class="level4"> 
+  <td>SamplingFrequency</td> 
+  <td>4</td> 
+  <td>[B5]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>&gt; 0</td> 
+  <td>8000.0</td> 
+  <td><abbr title="Float">f</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Sampling frequency in Hz.</td> 
+</tr> 
+<tr id="OutSamplingFrequency" class="level4"> 
+  <td>OutputSamplingFrequency</td> 
+  <td>4</td> 
+  <td>[78][B5]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>&gt; 0</td> 
+  <td>Sampling Frequency</td> 
+  <td><abbr title="Float">f</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Real output sampling frequency in Hz (used for SBR techniques).</td> 
+</tr> 
+<tr id="Channels" class="level4"> 
+  <td>Channels</td> 
+  <td>4</td> 
+  <td>[9F]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Numbers of channels in the track.</td> 
+</tr> 
+<tr class="version2" id="ChannelPositions"> 
+  <td>ChannelPositions</td> 
+  <td>4</td> 
+  <td>[7D][7B]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td>Table of horizontal angles for each successive channel, see <a href="#channelposition">appendix</a>.</td> 
+</tr> 
+<tr id="BitDepth" class="level4"> 
+  <td>BitDepth</td> 
+  <td>4</td> 
+  <td>[62][64]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Bits per sample, mostly used for PCM.</td> 
+</tr> 
+<tr class="subclass"> 
+  <td colspan="12" >end audio</td> 
+</tr> 
+<tr class="subclass"> 
+  <td colspan="12" >content encoding</td> 
+</tr> 
+<tr id="ContentEncodings" class="level3"> 
+  <td>ContentEncodings</td> 
+  <td>3</td> 
+  <td>[6d][80]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Settings for several content encoding mechanisms like compression
+  or encryption.</td> 
+</tr> 
+<tr id="ContentEncoding" class="level4"> 
+  <td>ContentEncoding</td> 
+  <td>4</td> 
+  <td>[62][40]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Settings for one content encoding like compression or encryption.</td> 
+</tr> 
+<tr id="ContentEncodingOrder" class="level5"> 
+  <td>ContentEncodingOrder</td> 
+  <td>5</td> 
+  <td>[50][31]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Tells when this modification was used during encoding/muxing
+  starting with 0 and counting upwards. The decoder/demuxer has to start
+  with the highest order number it finds and work its way down. This
+  value has to be unique over all ContentEncodingOrder elements in
+  the segment.</td> 
+</tr> 
+<tr id="ContentEncodingScope" class="level5"> 
+  <td>ContentEncodingScope</td> 
+  <td>5</td> 
+  <td>[50][32]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A bit field that describes which elements have been modified in
+  this way. Values (big endian) can be OR'ed. Possible values:<br/> 
+  1 - all frame contents,<br/> 
+  2 - the track's private data,<br/> 
+  4 - the next ContentEncoding (next ContentEncodingOrder. Either the data inside ContentCompression and/or ContentEncryption)</br/></br/></br/></td> 
+</tr> 
+<tr id="ContentEncodingType" class="level5"> 
+  <td>ContentEncodingType</td> 
+  <td>5</td> 
+  <td>[50][33]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A value describing what kind of transformation has been
+  done. Possible values:<br/> 
+  0 - compression,<br/> 
+  1 - encryption</br/></br/></td> 
+</tr> 
+<tr id="ContentCompression" class="level5"> 
+  <td>ContentCompression</td> 
+  <td>5</td> 
+  <td>[50][34]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Settings describing the compression used. Must be present if
+  the value of ContentEncodingType is 0 and absent otherwise. Each block
+  must be decompressable even if no previous block is available in order
+  not to prevent seeking.</td> 
+</tr> 
+<tr id="ContentCompAlgo" class="level6"> 
+  <td>ContentCompAlgo</td> 
+  <td>6</td> 
+  <td>[42][54]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The compression algorithm used. Algorithms that have been
+  specified so far are:<br/> 
+  0 - zlib,<br/> 
+  <del>1 - bzlib,</del><br/> 
+  <del>2 - lzo1x</del><br/> 
+  3 - Header Stripping,</br/></br/></br/></br/></td> 
+</tr> 
+<tr id="ContentCompSettings" class="level6"> 
+  <td>ContentCompSettings</td> 
+  <td>6</td> 
+  <td>[42][55]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Settings that might be needed by the decompressor. For Header Stripping (ContentCompAlgo=3), the bytes that were removed from the beggining of each frames of the track.</td> 
+</tr> 
+<tr id="ContentEncryption" class="level5"> 
+  <td>ContentEncryption</td> 
+  <td>5</td> 
+  <td>[50][35]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Settings describing the encryption used. Must be present if
+  the value of ContentEncodingType is 1 and absent otherwise.</td> 
+</tr> 
+<tr id="ContentEncAlgo" class="level6"> 
+  <td>ContentEncAlgo</td> 
+  <td>6</td> 
+  <td>[47][e1]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The encryption algorithm used. The value '0' means that the
+  contents have not been encrypted but only signed. Predefined
+  values:<br/> 
+  1 - DES, 2 - 3DES, 3 - Twofish, 4 - Blowfish, 5 - AES</br/></td> 
+</tr> 
+<tr id="ContentEncKeyID" class="level6"> 
+  <td>ContentEncKeyID</td> 
+  <td>6</td> 
+  <td>[47][e2]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>For public key algorithms this is the ID of the public key the
+  the data was encrypted with.</td> 
+</tr> 
+<tr id="ContentSignature" class="level6"> 
+  <td>ContentSignature</td> 
+  <td>6</td> 
+  <td>[47][e3]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+ 
+  <td>A cryptographic signature of the contents.</td> 
+</tr> 
+<tr id="ContentSigKeyID" class="level6"> 
+  <td>ContentSigKeyID</td> 
+  <td>6</td> 
+  <td>[47][e4]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>This is the ID of the private key the data was signed with.</td> 
+</tr> 
+<tr id="ContentSigAlgo" class="level6"> 
+  <td>ContentSigAlgo</td> 
+  <td>6</td> 
+  <td>[47][e5]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The algorithm used for the signature. A value of '0' means that
+  the contents have not been signed but only encrypted. Predefined
+  values:<br/> 
+  1 - RSA</br/></td> 
+</tr> 
+<tr id="ContentSigHashAlgo" class="level6"> 
+  <td>ContentSigHashAlgo</td> 
+  <td>6</td> 
+  <td>[47][e6]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The hash algorithm used for the signature. A value of '0' means
+  that the contents have not been signed but only encrypted. Predefined
+  values:<br/> 
+  1 - SHA1-160<br/> 
+  2 - MD5</br/></br/></td> 
+</tr> 
+<tr class="subclass"> 
+  <td colspan="12" >end content encoding</td> 
+</tr> 
+<tr id="TrackOperation" class="level2"> 
+  <td>TrackOperation</td> 
+  <td>2</td> 
+  <td>[E2]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Operation that needs to be applied on tracks to create this virtual track. For more details <a href="notes.html#TrackOperation">look at the Specification Notes</a> on the subject.</td> 
+</tr> 
+<tr id="TrackCombinePlanes" class="level3"> 
+  <td>TrackCombinePlanes</td> 
+  <td>3</td> 
+  <td>[E3]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contains the list of all video plane tracks that need to be combined to create this 3D track</td> 
+</tr> 
+<tr id="TrackPlane" class="level4"> 
+  <td>TrackPlane</td> 
+  <td>4</td> 
+  <td>[E4]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contains a video plane track that need to be combined to create this 3D track</td> 
+</tr> 
+<tr id="TrackPlaneUID" class="level5"> 
+  <td>TrackPlaneUID</td> 
+  <td>5</td> 
+  <td>[E5]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The trackUID number of the track representing the plane.</td> 
+</tr> 
+<tr id="TrackPlaneType" class="level5"> 
+  <td>TrackPlaneType</td> 
+  <td>5</td> 
+  <td>[E6]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The kind of plane this track corresponds to (0: left eye, 1: right eye, 2: background).</td> 
+</tr> 
+<tr id="TrackJoinBlocks" class="level3"> 
+  <td>TrackJoinBlocks</td> 
+  <td>3</td> 
+  <td>[E9]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contains the list of all tracks whose Blocks need to be combined to create this virtual track</td> 
+</tr> 
+<tr id="TrackJoinUID" class="level4"> 
+  <td>TrackJoinUID</td> 
+  <td>4</td> 
+  <td>[ED]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The trackUID number of a track whose blocks are used to create this virtual track.</td> 
+</tr> 
+<tr id="CueingData"> 
+  <th colspan="12" >Cueing Data</th> 
+</tr> 
+<tr id="Cues" class="level1"> 
+  <td>Cues</td> 
+  <td>1</td> 
+  <td style="white-space: nowrap">[1C][53][BB][6B]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>A top-level element to speed seeking access. All entries are local to
+    the segment. Should be mandatory for non <a href="../streaming/index.hmtl">&quot;live&quot; streams</a>.</td> 
+</tr> 
+<tr id="CuePoint" class="level2"> 
+  <td>CuePoint</td> 
+  <td>2</td> 
+  <td>[BB]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Contains all information relative to a seek point in the segment.</td> 
+</tr> 
+<tr id="CueTime" class="level3"> 
+  <td>CueTime</td> 
+  <td>3</td> 
+  <td>[B3]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Absolute timecode according to the segment time base.</td> 
+</tr> 
+<tr id="CueTrackPositions" class="level3"> 
+  <td>CueTrackPositions</td> 
+  <td>3</td> 
+  <td>[B7]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Contain positions for different tracks corresponding to the timecode.</td> 
+</tr> 
+<tr id="CueTrack" class="level4"> 
+  <td>CueTrack</td> 
+  <td>4</td> 
+  <td>[F7]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>The track for which a position is given.</td> 
+</tr> 
+<tr id="CueClusterPosition" class="level4"> 
+  <td>CueClusterPosition</td> 
+  <td>4</td> 
+  <td>[F1]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>The <a href="notes.html#Position_References">position</a> of the Cluster containing the required Block.</td> 
+</tr> 
+<tr id="CueBlockNumber" class="level4"> 
+  <td>CueBlockNumber</td> 
+  <td>4</td> 
+  <td>[53][78]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>Number of the Block in the specified Cluster.</td> 
+</tr> 
+<tr id="CueCodecState" class="level4"> 
+  <td>CueCodecState</td> 
+  <td>4</td> 
+  <td>[EA]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The <a href="notes.html#Position_References">position</a> of the Codec State corresponding
+    to this Cue element. 0 means that the data is taken from the initial Track
+    Entry.</td> 
+</tr> 
+<tr id="CueReference" class="level4"> 
+  <td>CueReference</td> 
+  <td>4</td> 
+  <td>[DB]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The Clusters containing the required referenced Blocks.</td> 
+</tr> 
+<tr id="CueRefTime" class="level5"> 
+  <td>CueRefTime</td> 
+  <td>5</td> 
+  <td>[96]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Timecode of the referenced Block.</td> 
+</tr> 
+<tr class="version2" id="CueRefCluster"> 
+  <td>CueRefCluster</td> 
+  <td>5</td> 
+  <td>[97]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td><a href="notes.html#Position_References">Position</a> of the Cluster containing the referenced
+    Block.</td> 
+</tr> 
+<tr class="version2" id="CueRefNumber"> 
+  <td>CueRefNumber</td> 
+  <td>5</td> 
+  <td>[53][5F]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td>Number of the referenced Block of Track X in the specified Cluster.</td> 
+</tr> 
+<tr class="version2" id="CueRefCodecState"> 
+  <td>CueRefCodecState</td> 
+  <td>5</td> 
+  <td>[EB]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td>The <a href="notes.html#Position_References">position</a> of the Codec State corresponding
+    to this referenced element. 0 means that the data is taken from the initial
+    Track Entry.</td> 
+</tr> 
+<tr id="Attachment"> 
+  <th colspan="12" >Attachment</th> 
+</tr> 
+<tr id="Attachments" class="level1"> 
+  <td>Attachments</td> 
+  <td>1</td> 
+  <td>[19][41][A4][69]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contain attached files.</td> 
+</tr> 
+<tr id="AttachedFile" class="level2"> 
+  <td>AttachedFile</td> 
+  <td>2</td> 
+  <td>[61][A7]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>An attached file.</td> 
+</tr> 
+<tr id="FileDescription" class="level3"> 
+  <td>FileDescription</td> 
+  <td>3</td> 
+  <td>[46][7E]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A human-friendly name for the attached file.</td> 
+</tr> 
+<tr id="FileName" class="level3"> 
+  <td>FileName</td> 
+  <td>3</td> 
+  <td>[46][6E]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Filename of the attached file.</td> 
+</tr> 
+<tr id="FileMimeType" class="level3"> 
+  <td>FileMimeType</td> 
+  <td>3</td> 
+  <td>[46][60]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="String">s</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>MIME type of the file.</td> 
+</tr> 
+<tr id="FileData" class="level3"> 
+  <td>FileData</td> 
+  <td>3</td> 
+  <td>[46][5C]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The data of the file.</td> 
+</tr> 
+<tr id="FileUID" class="level3"> 
+  <td>FileUID</td> 
+  <td>3</td> 
+  <td>[46][AE]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Unique ID representing the file, as random as possible.</td> 
+</tr> 
+<tr class="version2" id="FileReferral"> 
+  <td>FileReferral</td> 
+  <td>3</td> 
+  <td>[46][75]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="flagnot">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td class="flagnot"></td> 
+  <td>A binary value that a track/codec can refer to when the attachment is needed.</td> 
+</tr> 
+<tr id="Chapters"> 
+  <th colspan="12" >Chapters</th> 
+</tr> 
+<tr class="level1"> 
+  <td>Chapters</td> 
+  <td>1</td> 
+  <td>[10][43][A7][70]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+      <td>A system to define basic menus and partition data. For more detailed
+        information, look at the <a href="chapters/index.html">Chapters
+        Explanation</a>.</td> 
+</tr> 
+<tr id="EditionEntry" class="level2"> 
+  <td>EditionEntry</td> 
+  <td>2</td> 
+  <td>[45][B9]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contains all information about a segment edition.</td> 
+</tr> 
+<tr id="EditionUID" class="level3"> 
+  <td>EditionUID</td> 
+  <td>3</td> 
+  <td>[45][BC]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A unique ID to identify the edition. It's useful for tagging an edition.</td> 
+</tr> 
+<tr id="EditionFlagHidden" class="level3"> 
+  <td>EditionFlagHidden</td> 
+  <td>3</td> 
+  <td>[45][BD]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0-1</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>If an edition is hidden (1), it should not be available to the user interface (but still to Control Tracks). (1 bit)</td> 
+</tr> 
+<tr id="EditionFlagDefault" class="level3"> 
+  <td>EditionFlagDefault</td> 
+  <td>3</td> 
+  <td>[45][DB]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0-1</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>If a flag is set (1) the edition should be used as the default one. (1 bit)</td> 
+</tr> 
+<tr id="EditionFlagOrdered" class="level3"> 
+  <td>EditionFlagOrdered</td> 
+  <td>3</td> 
+  <td>[45][DD]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>0-1</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Specify if the chapters can be defined multiple times and the order to play them is enforced. (1 bit)</td> 
+</tr> 
+<tr id="ChapterAtom" class="level3"> 
+  <td>ChapterAtom</td> 
+  <td>3+</td> 
+  <td>[B6]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contains the atom information to use as the chapter atom (apply to all
+    tracks).</td> 
+</tr> 
+<tr id="ChapterUID" class="level4"> 
+  <td>ChapterUID</td> 
+  <td>4+</td> 
+  <td>[73][C4]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A unique ID to identify the Chapter.</td> 
+</tr> 
+<tr id="ChapterTimeStart" class="level4"> 
+  <td>ChapterTimeStart</td> 
+  <td>4+</td> 
+  <td>[91]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Timecode of the start of Chapter (not scaled).</td> 
+</tr> 
+<tr id="ChapterTimeEnd" class="level4"> 
+  <td>ChapterTimeEnd</td> 
+  <td>4+</td> 
+  <td>[92]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Timecode of the end of Chapter (timecode excluded, not scaled).</td> 
+</tr> 
+<tr id="ChapterHidden" class="level4"> 
+  <td>ChapterFlagHidden</td> 
+  <td>4+</td> 
+  <td>[98]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0-1</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>If a chapter is hidden (1), it should not be available to the user interface (but still to Control Tracks). (1 bit)</td> 
+</tr> 
+<tr id="ChapterEnable" class="level4"> 
+  <td>ChapterFlagEnabled</td> 
+  <td>4+</td> 
+  <td>[45][98]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0-1</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Specify wether the chapter is enabled. It can be enabled/disabled by a Control Track. When disabled, the movie should skip all the content between the TimeStart and TimeEnd of this chapter. (1 bit)</td> 
+</tr> 
+<tr id="ChapterSegmentUID" class="level4"> 
+  <td>ChapterSegmentUID</td> 
+  <td>4+</td> 
+  <td>[6E][67]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>>0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A segment to play in place of this chapter. Edition ChapterSegmentEditionUID should be used for this segment, otherwise no edition is used.</td> 
+</tr> 
+<tr id="ChapterSegmentEditionUID" class="level4"> 
+  <td>ChapterSegmentEditionUID</td> 
+  <td>4+</td> 
+  <td>[6E][BC]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The edition to play from the segment linked in ChapterSegmentUID.</td> 
+</tr> 
+<tr id="ChapterPhysicalEquiv" class="level4"> 
+  <td>ChapterPhysicalEquiv</td> 
+  <td>4+</td> 
+  <td>[63][C3]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Specify the physical equivalent of this ChapterAtom like &quot;DVD&quot; (60) or &quot;SIDE&quot; (50), see <a href="#physical">complete list of values</a>.</td> 
+</tr> 
+<tr id="ChapterTrack" class="level4"> 
+  <td>ChapterTrack</td> 
+  <td>4+</td> 
+  <td>[8F]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>List of tracks on which the chapter applies. If this element is not present, all tracks apply</td> 
+</tr> 
+<tr id="ChapterTrackNumber" class="level5"> 
+  <td>ChapterTrackNumber</td> 
+  <td>5+</td> 
+  <td>[89]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td>not 0</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>UID of the Track to apply this chapter too. In the absense of a control
+    track, choosing this chapter will select the listed Tracks and deselect
+    unlisted tracks. Absense of this element indicates that the Chapter should
+    be applied to any currently used Tracks.</td> 
+</tr> 
+<tr id="ChapterDisplay" class="level4"> 
+  <td>ChapterDisplay</td> 
+  <td>4+</td> 
+  <td>[80]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contains all possible strings to use for the chapter display.</td> 
+</tr> 
+<tr id="ChapString" class="level5"> 
+  <td>ChapString</td> 
+  <td>5+</td> 
+  <td>[85]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contains the string to use as the chapter atom.</td> 
+</tr> 
+<tr id="ChapLanguage" class="level5"> 
+      <td>ChapLanguage</td> 
+      <td>5+</td> 
+      <td>[43][7C]</td> 
+  <td>*</td> 
+ 
+      <td>*</td> 
+      <td class="unset">-</td> 
+      <td>eng</td> 
+      <td><abbr title="String">s</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+      <td>The languages corresponding to the string, in the <a href="http://lcweb.loc.gov/standards/iso639-2/englangn.html#two">bibliographic ISO-639-2 form</a>.</td> 
+    </tr> 
+<tr id="ChapCountry" class="level5"> 
+      <td>ChapCountry</td> 
+      <td>5+</td> 
+      <td>[43][7E]</td> 
+  <td class="unset">-</td> 
+      <td>*</td> 
+      <td class="unset">-</td> 
+      <td class="unset">-</td> 
+      <td><abbr title="String">s</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+      <td>The countries corresponding to the string, same 2 octets as in <a href="http://www.iana.org/cctld/cctld-whois.htm">Internet domains</a>.</td> 
+    </tr> 
+<tr id="ChapProcess" class="level4"> 
+    <td>ChapProcess</td> 
+    <td>4+</td> 
+    <td>[69][44]</td> 
+    <td class="unset">-</td> 
+    <td>*</td> 
+    <td class="unset">-</td> 
+    <td class="unset">-</td> 
+    <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+    <td>Contains all the commands associated to the Atom.</td> 
+</tr> 
+<tr id="ChapProcessCodecID" class="level5"> 
+    <td>ChapProcessCodecID</td> 
+    <td>5+</td> 
+    <td>[69][55]</td> 
+    <td>*</td> 
+    <td class="unset">-</td> 
+    <td class="unset">-</td> 
+    <td>0</td> 
+    <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+    <td>Contains the type of the codec used for the processing. A value of 0 means native Matroska processing (to be defined), a value of 1 means the <a href="chapters/index.html#dvd">DVD</a> command set is used. More codec IDs can be added later.</td> 
+</tr> 
+<tr id="ChapProcessPrivate" class="level5"> 
+  <td>ChapProcessPrivate</td> 
+  <td>5+</td> 
+  <td>[45][0D]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Some optional data attached to the ChapProcessCodecID information. <a href="chapters/index.html#dvd">For ChapProcessCodecID = 1</a>, it is the &quot;DVD level&quot; equivalent.</td> 
+</tr> 
+<tr id="ChapProcessCommand" class="level5"> 
+    <td>ChapProcessCommand</td> 
+    <td>5+</td> 
+    <td>[69][11]</td> 
+    <td class="unset">-</td> 
+    <td>*</td> 
+    <td class="unset">-</td> 
+    <td class="unset">-</td> 
+    <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+    <td>Contains all the commands associated to the Atom.</td> 
+</tr> 
+<tr id="ChapProcessTime" class="level6"> 
+    <td>ChapProcessTime</td> 
+    <td>6+</td> 
+    <td>[69][22]</td> 
+    <td>*</td> 
+    <td class="unset">-</td> 
+    <td class="unset">-</td> 
+    <td class="unset">-</td> 
+    <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+    <td>Defines when the process command should be handled (0: during the whole chapter, 1: before starting playback, 2: after playback of the chapter).</td> 
+</tr> 
+<tr id="ChapProcessData" class="level6"> 
+    <td>ChapProcessData</td> 
+    <td>6+</td> 
+    <td>[69][33]</td> 
+    <td>*</td> 
+    <td class="unset">-</td> 
+    <td class="unset">-</td> 
+    <td class="unset">-</td> 
+    <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+    <td>Contains the command information. The data should be interpreted depending on the ChapProcessCodecID value. <a href="chapters/index.html#dvd">For ChapProcessCodecID = 1</a>, the data correspond to the binary DVD cell pre/post commands.</td> 
+</tr> 
+<tr id="Tagging"> 
+  <th colspan="12" >Tagging</th> 
+</tr> 
+<tr id="Tags" class="level1"> 
+  <td>Tags</td> 
+  <td>1</td> 
+  <td>[12][54][C3][67]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Element containing elements specific to Tracks/Chapters. A list of valid
+        tags can be found <a href="tagging/index.html">here.</a></td> 
+</tr> 
+<tr id="Tag" class="level2"> 
+  <td>Tag</td> 
+  <td>2</td> 
+  <td>[73][73]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Element containing elements specific to Tracks/Chapters.</td> 
+</tr> 
+<tr id="Targets" class="level3"> 
+  <td>Targets</td> 
+  <td>3</td> 
+  <td>[63][C0]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contain all UIDs where the specified meta data apply. It is empty to
+        describe everything in the segment.</td> 
+</tr> 
+<tr id="TargetTypeValue" class="level4"> 
+  <td>TargetTypeValue</td> 
+  <td>4</td> 
+  <td>[68][CA]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>50</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A number to indicate the logical level of the target (see <a href="tagging/index.html#targettypes">TargetType</a>).</td> 
+</tr> 
+<tr id="TargetType" class="level4"> 
+  <td>TargetType</td> 
+  <td>4</td> 
+  <td>[63][CA]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="String">s</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>An <strong>informational</strong> string that can be used to display the logical level of the target like "ALBUM", "TRACK", "MOVIE", "CHAPTER", etc (see <a href="tagging/index.html#targettypes">TargetType</a>).</td> 
+</tr> 
+<tr id="TTrackUID" class="level4"> 
+  <td>TrackUID</td> 
+  <td>4</td> 
+  <td>[63][C5]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A unique ID to identify the Track(s) the tags belong to. If the value is 0 at this level, the tags apply to all tracks in the Segment.</td> 
+</tr> 
+<tr id="TEditionUID" class="level4"> 
+  <td>EditionUID</td> 
+  <td>4</td> 
+  <td>[63][C9]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A unique ID to identify the EditionEntry(s) the tags belong to. If the value is 0 at this level, the tags apply to all editions in the Segment.</td> 
+</tr> 
+<tr id="TChapterUID" class="level4"> 
+  <td>ChapterUID</td> 
+  <td>4</td> 
+  <td>[63][C4]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A unique ID to identify the Chapter(s) the tags belong to. If the value is 0 at this level, the tags apply to all chapters in the Segment.</td> 
+</tr> 
+<tr id="AttachmentUID" class="level4"> 
+  <td>AttachmentUID</td> 
+  <td>4</td> 
+  <td>[63][C6]</td> 
+  <td class="unset">-</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>A unique ID to identify the Attachment(s) the tags belong to. If the value is 0 at this level, the tags apply to all the attachments in the Segment.</td> 
+</tr> 
+<tr id="SimpleTag" class="level3"> 
+  <td>SimpleTag</td> 
+  <td>3+</td> 
+  <td>[67][C8]</td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Master Elements">m</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Contains general information about the target.</td> 
+</tr> 
+<tr id="TagName" class="level4"> 
+  <td>TagName</td> 
+  <td>4+</td> 
+  <td>[45][A3]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The name of the Tag that is going to be stored.</td> 
+ 
+</tr> 
+<tr id="TagLanguage" class="level4"> 
+  <td>TagLanguage</td> 
+  <td>4+</td> 
+  <td>[44][7A]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td>und</td> 
+  <td><abbr title="String">s</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Specifies the language of the tag specified, in the <a href="#languages">Matroska languages form</a>.</td> 
+</tr> 
+<tr id="TagDefault" class="level4"> 
+  <td>TagDefault</td> 
+  <td>4+</td> 
+  <td>[44][84]</td> 
+  <td>*</td> 
+  <td class="unset">-</td> 
+  <td>0-1</td> 
+  <td>1</td> 
+  <td><abbr title="Unsigned Integer">u</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>Indication to know if this is the default/original language to use for the given tag. (1 bit)</td> 
+</tr> 
+<tr id="TagString" class="level4"> 
+  <td>TagString</td> 
+  <td>4+</td> 
+  <td>[44][87]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="UTF-8">8</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The value of the Tag.</td> 
+</tr> 
+<tr id="TagBinary" class="level4"> 
+  <td>TagBinary</td> 
+  <td>4+</td> 
+  <td>[44][85]</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td class="unset">-</td> 
+  <td><abbr title="Binary">b</abbr></td> 
+  <td>*</td> 
+  <td>*</td> 
+  <td class="flagnot"></td> 
+  <td>The values of the Tag if it is binary. Note that this cannot be used in the same SimpleTag as TagString.</td> 
+</tr> 
+<tr class="toptitle"> 
+  <th>Element Name</th> 
+  <th title="Level"><abbr title="Level">L</abbr></th> 
+  <th>EBML ID</th> 
+  <th title="Mandatory"><abbr title="Mandatory">Ma</abbr></th> 
+  <th title="Multiple"><abbr title="Multiple">Mu</abbr></th> 
+  <th title="Range"><abbr title="Range">Rng</abbr></th> 
+  <th>Default</th> 
+  <th title="Element Type"><abbr title="Element Type">T</abbr></th> 
+  <th title="Version 1"><abbr title="Version 1">1</abbr></th> 
+  <th title="Version 2"><abbr title="Version 2">2</abbr></th> 
+  <th title="WebM"><abbr title="WebM">W</abbr></th> 
+  <th>Description</th> 
+</tr> 
+ 
+</tr></tbody></table> 
+ 
+</div> 
+ 
+<p><b>All top-levels elements (Segment and direct sub-elements) are coded on 4 octets, i.e. class D elements.</b></p> 
+ 
+<h3 id="Appendix">Appendix</h3> 
+ 
+<div> 
+<h4 id="languages">Language Codes</h4> 
+<p>Language codes can be either the 3 letters <a href="http://lcweb.loc.gov/standards/iso639-2/englangn.html#two">bibliographic ISO-639-2</a> form (like &quot;fre&quot; for french), or a language code mixed with a country code for specialities in languages (like &quot;fre-ca&quot; for canadian french).</p> 
+</div> 
+ 
+<div> 
+<h4 id="physical">Physical Types</h4> 
+<p>Each level can have different meanings for audio and video. The ORIGINAL_MEDIUM tag can be used to specify a string for ChapterPhysicalEquiv = 60. Here is the list of possible levels for both audio and video :</p> 
+ 
+<div class="techdef"> 
+<table> 
+<tr><th>ChapterPhysicalEquiv</th><th>Audio</th><th>Video</th><th>Comment</th></tr> 
+<tr><td>70</td><td>SET / PACKAGE</td><td>SET / PACKAGE</td><td>the collection of different media</td></tr> 
+<tr><td>60</td><td>CD / 12" / 10" / 7" / TAPE / MINIDISC / DAT</td><td>DVD / VHS / LASERDISC</td><td>the physical medium like a CD or a DVD</td></tr> 
+<tr><td>50</td><td>SIDE</td><td>SIDE</td><td>when the original medium (LP/DVD) has different sides</td></tr> 
+<tr><td>40</td><td>-</td><td>LAYER</td><td>another physical level on DVDs</td></tr> 
+<tr><td>30</td><td>SESSION</td><td>SESSION</td><td>as found on CDs and DVDs</td></tr> 
+<tr><td>20</td><td>TRACK</td><td>-</td><td>as found on audio CDs</td></tr> 
+<tr><td>10</td><td>INDEX</td><td>-</td><td>the first logical level of the side/medium</td></tr> 
+</table> 
 </body> 
 </html> 
