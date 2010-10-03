@@ -7,25 +7,12 @@
 <body> 
       <h1>EBML Parser</h1> 
       <p>
-        Drag a webM file here.
-        Then Drag another WebM file here.
+        Drag an EBML file here.
         <video id="awesome"></video>
       </p>
 <script src="schema.js"></script>
 <script src="lib.js"></script>
 <script> 
-
-function parseRIFF(string){
-  var offset = 0;
-  var id = string.substr(offset, 4);
-  var len = parseInt(string.substr(offset+4, 4).split('').map(function(i){
-    var unpadded = i.charCodeAt(0).toString(2);
-    return (new Array(8 - unpadded.length + 1)).join('0') + unpadded
-  }).join(''),2);
-  var data = string.substr(offset + 4 + 4, len);
-  
-}
-
 function encode_64(input) {
 	var output = "", i = 0, l = input.length,
 	key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", 
@@ -68,18 +55,16 @@ document.documentElement.ondrop = function (e) {
       var V1 = EBML.Segment[0].Tracks[0].TrackEntry[0].Video;
       var V2 = EBML2.Segment[0].Tracks[0].TrackEntry[0].Video;
 
-      V1.DisplayHeight = V2.PixelHeight;
-      V1.DisplayWidth = V2.PixelWidth;
-      V1.PixelHeight = V2.PixelHeight;
-      V1.PixelWidth = V2.PixelWidth;
+      //V1.DisplayHeight = 100;
+      //V1.DisplayWidth = 100
+      //V1.PixelHeight = 100
+      //V1.PixelWidth = 100
 
       EBML.Segment[0].Cluster[0].SimpleBlock[0] = EBML2.Segment[0].Cluster[0].SimpleBlock[0]
-      awesome.src = 'data:video/webm;base64,'+encode_64(generateEBML(EBML))
+      //awesome.src = 'data:video/webm;base64,'+encode_64(generateEBML(EBML))
     }else{
       EBML = ebml;
     }
-
-    
   };
   reader.readAsBinaryString(file);
  

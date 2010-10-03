@@ -1,0 +1,41 @@
+1000010010010000000000100000000111100001100000000001000
+122234444444444444444444
+00000000
+0000000000000000
+000000000000000000000000
+000000000000000000000000000000000000000000000000
+
+
+Start code byte 0 0x9d
+Start code byte 1 0x01
+Start code byte 2 0x2a
+
+At the highest level, every compressed frame has three or more pieces. It begins with an uncompressed data
+chunk comprising 10 bytes in the case of key frames and 3-bytes for inter frames. This is followed by two or
+more blocks of compressed data (called partitions). These compressed data partitions begin and end on byte
+boundaries.
+
+frame_tag f(24)
+if (key_frame) {
+start_code f(24)
+horizontal_size_code f(16)
+vertical_size_code f(16)
+}
+
+unsigned char *c = pbi->Source;
+unsigned int tmp;
+tmp = (c[2] << 16) | (c[1] << 8) | c[0];
+key_frame = tmp & 0x1;
+version = (tmp >> 1) & 0x7;
+show_frame = (tmp >> 4) & 0x1;
+first_part_size = (tmp >> 5) & 0x7FFFF;
+
+
+unsigned char *c = pbi->Source + 6;
+unsigned int tmp;
+tmp = (c[1] << 8) | c[0];
+width = tmp & 0x3FFF;
+horizontal_scale = tmp >> 14;
+tmp = (c[3] << 8) | c[2];
+height = tmp & 0x3FFF;
+vertical_scale = tmp >> 14;

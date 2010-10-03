@@ -38,6 +38,14 @@ function parseRIFF(string){
   return chunks
 }
 
+function toHex(string){
+  return string.split('').map(function(i){
+    var unpadded = i.charCodeAt(0).toString(16);
+    return (new Array(2 - unpadded.length + 1)).join('0') + unpadded;
+  }).join('')
+}
+
+
 
 function encode_64(input) {
 	var output = "", i = 0, l = input.length,
@@ -72,7 +80,10 @@ document.documentElement.ondrop = function (e) {
     console.log('loaded string');
     if(window.VP8){
       EBML = parseEBML(binary);
-EBML.Segment[0].Cluster[0].SimpleBlock[0] = 'Poop'//VP8
+
+EBML.Segment[0].Cluster[0].SimpleBlock[0] = EBML.Segment[0].Cluster[0].SimpleBlock[0].substr(0,4) + VP8.substr(4);
+      
+//EBML.Segment[0].Cluster[0].SimpleBlock[0] = EBML.Segment[0].Cluster[0].SimpleBlock[0];
       awesome.src = 'data:video/webm;base64,'+encode_64(generateEBML(EBML))
     }else{
     console.log(parseRIFF(binary));
