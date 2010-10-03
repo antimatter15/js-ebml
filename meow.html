@@ -1,0 +1,112 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head>
+<meta charset=utf-8 /> 
+<title>EBML Parser</title> 
+
+<body> 
+      <h1>EBML Parser</h1> 
+      <p>
+        Drag an EBML file here.
+        <video id="awesome"></video>
+      </p>
+      <script src="schema.js"></script>
+<script src="v2.js"></script>
+<script> 
+
+
+function parseRIFF(string){
+  var offset = 0;
+  var chunks = {};
+  while(offset < string.length){
+    var id = string.substr(offset, 4);
+    var len = parseInt(string.substr(offset+4, 4).split('').map(function(i){
+      var unpadded = i.charCodeAt(0).toString(2);
+      return (new Array(8 - unpadded.length + 1)).join('0') + unpadded
+    }).join(''),2);
+    var data = string.substr(offset + 4 + 4, len);
+    //console.log(id, len, data);
+    offset += 4 + 4 + len;
+    chunks[id] = chunks[id] || [];
+    if(id == 'RIFF'){
+      chunks[id].push(parseRIFF(data));
+    }else if(id == 'LIST'){
+      chunks[id].push(parseRIFF(data));
+    }else{
+      chunks[id].push(data)
+    }
+    
+  }
+  return chunks
+}
+
+
+
+function toHex(string){
+  return string.split('').map(function(i){
+    var unpadded = i.charCodeAt(0).toString(16);
+    return (new Array(2 - unpadded.length + 1)).join('0') + unpadded;
+  }).join('')
+}
+
+function encode_64(input) {
+	var output = "", i = 0, l = input.length,
+	key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", 
+	chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+	while (i < l) {
+		chr1 = input.charCodeAt(i++);
+		chr2 = input.charCodeAt(i++);
+		chr3 = input.charCodeAt(i++);
+		enc1 = chr1 >> 2;
+		enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+		enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+		enc4 = chr3 & 63;
+		if (isNaN(chr2)) enc3 = enc4 = 64;
+		else if (isNaN(chr3)) enc4 = 64;
+		output = output + key.charAt(enc1) + key.charAt(enc2) + key.charAt(enc3) + key.charAt(enc4);
+	}
+	return output;
+}
+
+var awesome = document.getElementById('awesome');
+
+//location='data:video/webm;base64,'+encode_64(generateEBML(EBML))
+document.documentElement.ondragover = function () { return false; };
+document.documentElement.ondragend = function () { return false; };
+
+
+
+document.documentElement.ondrop = function (e) {
+  e.preventDefault();
+  console.log(e);
+  var file = e.dataTransfer.files[0],
+      reader = new FileReader();
+  reader.onload = function (event) {
+
+  
+    binary = event.target.result;
+    console.log('loaded string');
+    if(window.VP8){
+    EBML = parseEBML(binary);
+    console.log('testing if', binary == generateEBML(EBML));
+var header = '\x81\x00\x00\x80';
+EBML[1].data[4].data[1].data = header + VP8.substr(4);
+
+
+      
+    
+    //EBML[1].data[3].data[0].data[7].data[1].data = toBinStr("0000011110000000"); //toBinStr((1000).toString(2)) //Pixelheight
+    //EBML[1].data[3].data[0].data[7].data[0].data = toBinStr((1000).toString(2)) //PixelWidth
+    awesome.src = 'data:video/webm;base64,'+encode_64(generateEBML(EBML))
+}else{
+      var riff = parseRIFF(binary);
+    VP8 = riff.RIFF[0].WEBP[0];
+}
+  };
+  reader.readAsBinaryString(file);
+ 
+  return false;
+};
+</script>   
+</body> 
+</html> 
