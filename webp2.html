@@ -1,0 +1,173 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head>
+<meta charset=utf-8 /> 
+<title>Weppy Parser</title> 
+
+<body> 
+      <h1>Weppy Parser</h1> 
+      <p>
+        <video id="awesome"></video>
+      </p>
+<script src="schema.js"></script>
+<script src="lib.js"></script>
+<script> 
+
+var EBML = {
+  "EBML": [
+    {
+      "EBMLVersion": 1,
+      "EBMLReadVersion": 1,
+      "EBMLMaxIDLength": 4,
+      "EBMLMaxSizeLength": 8,
+      "DocType": "webm",
+      "DocTypeVersion": 2,
+      "DocTypeReadVersion": 2
+    }
+  ],
+  "Segment": [
+    {
+      "Tracks": [
+        {
+          "TrackEntry": [
+            {
+              "TrackNumber": 1,
+              "TrackUID": 1,
+              "FlagLacing": 0,
+              "Language": "und",
+              "CodecID": "V_VP8",
+              "TrackType": 1,
+              "DefaultDuration": 40000000,
+              "Video": {
+                "PixelWidth": 1231,
+                "PixelHeight": 847
+              }
+            }
+          ]
+        }
+      ],
+      "Cluster": [
+        {
+          "Timecode": 0,
+          "SimpleBlock": [
+            "MAGICKSTUFF"
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+
+function parseRIFF(string){
+  var offset = 0;
+  var chunks = {};
+  while(offset < string.length){
+    var id = string.substr(offset, 4);
+    var len = parseInt(string.substr(offset+4, 4).split('').map(function(i){
+      var unpadded = i.charCodeAt(0).toString(2);
+      return (new Array(8 - unpadded.length + 1)).join('0') + unpadded
+    }).join(''),2);
+    var data = string.substr(offset + 4 + 4, len);
+    //console.log(id, len, data);
+    offset += 4 + 4 + len;
+    chunks[id] = chunks[id] || [];
+    if(id == 'RIFF'){
+      chunks[id].push(parseRIFF(data));
+    }else if(id == 'LIST'){
+      chunks[id].push(parseRIFF(data));
+    }else{
+      chunks[id].push(data)
+    }
+    
+  }
+  return chunks
+}
+
+function toHex(string){
+  return string.split('').map(function(i){
+    var unpadded = i.charCodeAt(0).toString(16);
+    return (new Array(2 - unpadded.length + 1)).join('0') + unpadded;
+  }).join('')
+}
+
+//"10000001000000000000000010000000"
+
+function encode_64(input) {
+	var output = "", i = 0, l = input.length,
+	key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", 
+	chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+	while (i < l) {
+		chr1 = input.charCodeAt(i++);
+		chr2 = input.charCodeAt(i++);
+		chr3 = input.charCodeAt(i++);
+		enc1 = chr1 >> 2;
+		enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+		enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+		enc4 = chr3 & 63;
+		if (isNaN(chr2)) enc3 = enc4 = 64;
+		else if (isNaN(chr3)) enc4 = 64;
+		output = output + key.charAt(enc1) + key.charAt(enc2) + key.charAt(enc3) + key.charAt(enc4);
+	}
+	return output;
+}
+var awesome = document.getElementById('awesome');
+
+//location='data:video/webm;base64,'+encode_64(generateEBML(EBML))
+document.documentElement.ondragover = function () { return false; };
+document.documentElement.ondragend = function () { return false; };
+document.documentElement.ondrop = function (e) {
+  e.preventDefault();
+  console.log(e);
+  var file = e.dataTransfer.files[0],
+      reader = new FileReader();
+  reader.onload = function (event) {
+    var binary = event.target.result;
+    console.log('loaded string');
+
+    console.log(parseRIFF(binary));
+
+    var riff = parseRIFF(binary);
+    VP8 = riff.RIFF[0].WEBP[0];
+
+    var frame_start = VP8.indexOf('\x9d\x01\x2a')
+    /*
+    unsigned char *c = pbi->Source + 6;
+    unsigned int tmp;
+    tmp = (c[1] << 8) | c[0];
+    width = tmp & 0x3FFF;
+    horizontal_scale = tmp >> 14;
+    tmp = (c[3] << 8) | c[2];
+    height = tmp & 0x3FFF;
+    vertical_scale = tmp >> 14;
+    */
+    for(var i = 0, c = []; i < 4; i++){
+      c[i] = VP8.charCodeAt(frame_start + 3 + i)
+    }
+    var width, horizontal_scale, height, vertical_scale, tmp;
+    tmp = (c[1] << 8) | c[0];
+    width = tmp & 0x3FFF;
+    horizontal_scale = tmp >> 14;
+    tmp = (c[3] << 8) | c[2];
+    height = tmp & 0x3FFF;
+    vertical_scale = tmp >> 14;
+    console.log(width, height);
+
+      var V1 = EBML.Segment[0].Tracks[0].TrackEntry[0].Video;
+
+      V1.PixelHeight = height
+      V1.PixelWidth = width
+
+    EBML.Segment[0].Cluster[0].SimpleBlock[0] = '\x81\x00\x00\x80' + VP8.substr(4);
+
+    
+    awesome.src = 'data:video/webm;base64,'+encode_64(generateEBML(EBML))
+    
+  };
+  reader.readAsBinaryString(file);
+ 
+  return false;
+};
+</script>   
+</body> 
+</html> 
