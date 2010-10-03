@@ -2,13 +2,11 @@
 <html lang="en"> 
 <head>
 <meta charset=utf-8 /> 
-<title>EBML Parser</title> 
+<title>Weppy Parser</title> 
 
 <body> 
-      <h1>EBML Parser</h1> 
+      <h1>Weppy Parser</h1> 
       <p>
-        Drag a webM file here.
-        Then Drag another WebM file here.
         <video id="awesome"></video>
       </p>
 <script src="schema.js"></script>
@@ -17,14 +15,29 @@
 
 function parseRIFF(string){
   var offset = 0;
-  var id = string.substr(offset, 4);
-  var len = parseInt(string.substr(offset+4, 4).split('').map(function(i){
-    var unpadded = i.charCodeAt(0).toString(2);
-    return (new Array(8 - unpadded.length + 1)).join('0') + unpadded
-  }).join(''),2);
-  var data = string.substr(offset + 4 + 4, len);
-  
+  var chunks = {};
+  while(offset < string.length){
+    var id = string.substr(offset, 4);
+    var len = parseInt(string.substr(offset+4, 4).split('').map(function(i){
+      var unpadded = i.charCodeAt(0).toString(2);
+      return (new Array(8 - unpadded.length + 1)).join('0') + unpadded
+    }).join(''),2);
+    var data = string.substr(offset + 4 + 4, len);
+    //console.log(id, len, data);
+    offset += 4 + 4 + len;
+    chunks[id] = chunks[id] || [];
+    if(id == 'RIFF'){
+      chunks[id].push(parseRIFF(data));
+    }else if(id == 'LIST'){
+      chunks[id].push(parseRIFF(data));
+    }else{
+      chunks[id].push(data)
+    }
+    
+  }
+  return chunks
 }
+
 
 function encode_64(input) {
 	var output = "", i = 0, l = input.length,
@@ -57,28 +70,16 @@ document.documentElement.ondrop = function (e) {
   reader.onload = function (event) {
     var binary = event.target.result;
     console.log('loaded string');
-    var ebml = parseEBML(binary);
-    if(window.EBML){
-      EBML2 = ebml;
-      //EBML.Segment[0].Tracks[0].TrackEntry[0].Video
-      //{DisplayHeight, DisplayWidth, PixelHeight, PixelWidth
-      //EBML.Segment[0].Cluster[0].SimpleBlock[0]
-      //string with stuff
-
-      var V1 = EBML.Segment[0].Tracks[0].TrackEntry[0].Video;
-      var V2 = EBML2.Segment[0].Tracks[0].TrackEntry[0].Video;
-
-      V1.DisplayHeight = V2.PixelHeight;
-      V1.DisplayWidth = V2.PixelWidth;
-      V1.PixelHeight = V2.PixelHeight;
-      V1.PixelWidth = V2.PixelWidth;
-
-      EBML.Segment[0].Cluster[0].SimpleBlock[0] = EBML2.Segment[0].Cluster[0].SimpleBlock[0]
+    if(window.VP8){
+      EBML = parseEBML(binary);
+EBML.Segment[0].Cluster[0].SimpleBlock[0] = 'Poop'//VP8
       awesome.src = 'data:video/webm;base64,'+encode_64(generateEBML(EBML))
     }else{
-      EBML = ebml;
-    }
+    console.log(parseRIFF(binary));
 
+    var riff = parseRIFF(binary);
+    VP8 = riff.RIFF[0].WEBP[0];
+    }
     
   };
   reader.readAsBinaryString(file);
