@@ -192,6 +192,8 @@ function parseEBML(string){
     var element = schema[hexid];
     var name = element ? element.name : hexid;
     var value = data;
+
+    console.log(string.substr(offset, 4), name, el_id)
     if(element){
       var type = element.type;
 
@@ -209,9 +211,7 @@ function parseEBML(string){
         //binary
         value = data;
       }else if(type == "f"){
-        console.log(data, data.length)
         //float
-        console.log(numparse.toDouble(data))
         value = numparse.toDouble(data)
       }else{
         console.log('unknown type', type)

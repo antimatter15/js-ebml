@@ -66,6 +66,37 @@ document.documentElement.ondrop = function (e) {
       EBML = ebml;
     }
 
+    delete EBML.Segment[0].SeekHead
+    delete EBML.Segment[0].Cues
+    delete EBML.Segment[0].Void
+
+EBML.Segment[0].Cluster[0].SimpleBlock.map(function(e){
+    var block = parseSimpleBlock(e);
+    console.log(block)
+    data=block.frame.split('').map(function(z){return z.charCodeAt(0)});
+    function BITS_MASK(n){return ((1<<(n))-1)}
+    function BITS_GET(val, bit, len){return (((val)>>(bit))&BITS_MASK(len))}
+
+        raw = data[0] | (data[1] << 8) | (data[2] << 16);
+       is_keyframe     = !BITS_GET(raw, 0, 1);
+       version         = BITS_GET(raw, 1, 2);
+       is_experimental = BITS_GET(raw, 3, 1);
+       is_shown        = BITS_GET(raw, 4, 1);
+       part0_sz        = BITS_GET(raw, 5, 19);
+       if(is_keyframe){
+        if (data[3] != 0x9d || data[4] != 0x01 || data[5] != 0x2a){
+          console.warn("VPX_CODEC_UNSUP_BITSTREAM")
+        }
+        raw = data[6] | (data[7] << 8)  | (data[8] << 16) | (data[9] << 24);
+        width = BITS_GET(raw, 0, 14);
+        scale_w = BITS_GET(raw, 14, 2);
+        height = BITS_GET(raw, 16, 14);
+        scale_h = BITS_GET(raw, 30, 2);
+        console.log(width, scale_w, height, scale_h);
+
+       }
+    console.log(is_keyframe, version, is_experimental, is_shown, part0_sz, e.length)
+  })
   
       awesome.src = 'data:video/webm;base64,'+encode_64(generateEBML(EBML))
       //location = toDataURL(generateEBML(EBML))
@@ -74,6 +105,37 @@ document.documentElement.ondrop = function (e) {
  
   return false;
 };
+
+//http://git.chromium.org/gitweb/?p=webm/webm-dash-javascript.git;a=blob;f=shared/webm_parser.js;h=af43c99ae35abbfd8874343134e873e31d132e75;hb=HEAD#l797
+function parseSimpleBlock(data){
+  if(data.length < 4){
+    throw "Invalid Simple Block";
+  }
+  var buf = data.substr(0,4).split('').map(function(e){
+    return e.charCodeAt(0)
+  });
+  if((buf[0] & 0x80) != 0x80){
+    throw "Invalid Simple Block: TrackNumber > 127 not supported";
+  }
+  var trackNum = buf[0] & 0x7f;
+  var timecode = buf[1] << 8 | buf[2];
+  var flags = buf[3] & 0xff;
+  var keyframe = flags >> 7;
+  var invisible = ((flags >> 3) & 0x1);
+  var discardable = (flags  & 0x1);
+  var lacing = (flags >> 1) & 0x3;
+  //0 = no lacing, 1 = xiph lacing, 2 = fixed-size lacing, 3 = ebml lacing
+
+  return {
+    trackNum: trackNum,
+    timecode: timecode,
+    lacing: lacing,
+    discardable: discardable,
+    invisible: invisible,
+    keyframe: keyframe,
+    frame: data.substr(4)
+  }
+}
 
 function toDataURL(webm){
     return 'data:video/webm,' + escape(webm); 
