@@ -817,7 +817,7 @@ var schema = {
   },
   "cf": {
     "desc": "The (scaled) duration to apply to the element.",
-    "name": "Duration",
+    "name": "SliceDuration",
     "mu": false,
     "level": "5",
     "def": "0",

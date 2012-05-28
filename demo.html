@@ -45,6 +45,7 @@ document.documentElement.ondrop = function (e) {
     var binary = event.target.result;
     console.log('loaded string');
     var ebml = parseEBML(binary);
+    BINARY = binary
     if(window.EBML){
       EBML2 = ebml;
       //EBML.Segment[0].Tracks[0].TrackEntry[0].Video
@@ -61,15 +62,22 @@ document.documentElement.ondrop = function (e) {
       //V1.PixelWidth = 100
 
       EBML.Segment[0].Cluster[0].SimpleBlock[0] = EBML2.Segment[0].Cluster[0].SimpleBlock[0]
-      //awesome.src = 'data:video/webm;base64,'+encode_64(generateEBML(EBML))
     }else{
       EBML = ebml;
     }
+
+  
+      awesome.src = 'data:video/webm;base64,'+encode_64(generateEBML(EBML))
+      //location = toDataURL(generateEBML(EBML))
   };
   reader.readAsBinaryString(file);
  
   return false;
 };
+
+function toDataURL(webm){
+    return 'data:video/webm,' + escape(webm); 
+  }
 </script>   
 </body> 
 </html> 
