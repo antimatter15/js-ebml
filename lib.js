@@ -212,7 +212,12 @@ function parseEBML(string){
         value = data;
       }else if(type == "f"){
         //float
-        value = numparse.toDouble(data)
+          if(size === 4){
+              value = numparse.toFloat(data);
+          }
+          else {
+              value = numparse.toDouble(data);
+          }
       }else{
         console.log('unknown type', type)
       }
